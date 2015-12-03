@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<head>
+<title>Bug Game</title>
+<meta charset="utf-8"></meta>
+<meta name=“keywords”
+	content=“JISIKSOFT,jisiksoft,IT,Programming,Education,Publication”></meta>
+<meta name=“Description” content=“JISIKSOFT does the best to Advance SoftwareTechnologyintheWorld.”></meta>
+<link rel="stylesheet" href="../common/css/jquery-ui.min.css"></link>
+<link rel="stylesheet" href="../common/css/jisiksoft.css"></link>
+<script src="../common/js/jquery-2.1.3.min.js"></script>
+<script src="../common/js/jquery-ui.min.js"></script>
+
+<script>
+	makeSlidebarTwoCursor = function(min, cur1, cur2, max, divId) {
+
+		var thisId = '#' + divId;
+
+		var nameThis = $(thisId).attr('id');
+		var nameSlidebar = nameThis + 'slidebar';
+		var nameInner1 = nameThis + 'slidebar_inner1';
+		var nameCursor1 = nameThis + 'slidebar_cursor1';
+		var nameInner2 = nameThis + 'slidebar_inner2';
+		var nameCursor2 = nameThis + 'slidebar_cursor2';
+
+		var nameSafe = nameThis + 'slidebar_safe';
+		var nameWarning = nameThis + 'slidebar_warning';
+		var nameDanger = nameThis + 'slidebar_danger';
+
+		var originX = $(thisId).offset().left;
+
+		var width = $(thisId).width();
+		var len = width - 10;
+		var pos1 = (len * cur1) / max;
+		var pos2 = (len * cur2) / max;
+		var len1 = pos2 + 10;
+		var len2 = width - pos1;
+		var len3 = width - pos2 - 5;
+		var len4 = pos2 - pos1;
+		var curPos2 = pos2 - pos1;
+
+		var rangPos1 = pos1 + 5;
+		var rangPos2 = pos2 + 5;
+
+		var str = '<div id="'
+				+ nameSlidebar
+				+ '" style="position:absolute;width:'
+				+ width
+				+ 'px;height:13px;background-size:100% 100%;background-repeat:no-repeat;background-image:url(\'./picture/bar_slider.png\');"> \
+                                <div id="'
+				+ nameSafe
+				+ '" style="position:absolute;width:'
+				+ rangPos1
+				+ 'px;height:13px;background-size:100% 100%;background-repeat:no-repeat;background-image:url(\'./picture/bar_slider_safe.png\');"></div> \
+                                <div id="'
+				+ nameWarning
+				+ '" style="position:absolute;left:'
+				+ rangPos1
+				+ 'px;width:'
+				+ curPos2
+				+ 'px;height:13px;background-size:100% 100%;background-repeat:no-repeat;background-image:url(\'./picture/bar_slider_warning.png\');"></div> \
+                                <div id="'
+				+ nameDanger
+				+ '" style="position:absolute;left:'
+				+ rangPos2
+				+ 'px;width:'
+				+ len3
+				+ 'px;height:13px;background-size:100% 100%;background-repeat:no-repeat;background-image:url(\'./picture/bar_slider_danger.png\');"></div> \
+                                <div id="'+nameInner1+'" style="position:absolute;width:'+len1+'px;height:13px;"> \
+                                  <div id="'
+				+ nameCursor1
+				+ '" style="position:absolute;left:'
+				+ pos1
+				+ 'px;width:10px;height:13px;z-index:51;cursor:pointer;background-image:url(\'./picture/cursor_slider.png\')"></div> \
+                                </div> \
+                                <div id="'+nameInner2+'" style="position:absolute;left:'+pos1+'px;width:'+len2+'px;height:13px;"> \
+                                  <div id="'
+				+ nameCursor2
+				+ '" style="position:absolute;left:'
+				+ curPos2
+				+ 'px;width:10px;height:13px;z-index:51;cursor:pointer;background-image:url(\'./picture/cursor_slider.png\')"></div> \
+                                </div> \
+                            </div>';
+
+		$(thisId).empty().html(str);
+
+		//----------------- add to write string -----------------
+		var valCursor1 = nameThis + 'cursor1_value';
+		var valCursor2 = nameThis + 'cursor2_value';
+
+		str = '<div id="'+valCursor1+'" style="position:absolute;left:'+pos1+'px;top:-20px;z-index:50;color:#555555;">'
+				+ cur1
+				+ '</div> \
+                  <div id="'+valCursor2+'" style="position:absolute;left:'+pos2+'px;top:-20px;z-index:50;color:#555555;">'
+				+ cur2 + '</div>';
+
+		$(thisId).append(str);
+		//-------------------------------------------------------
+
+		var slidebarFirst = $('#' + nameInner1);
+		var slidebarSecond = $('#' + nameInner2);
+		var slidecursorFirst = $('#' + nameCursor1);
+		var slidecursorSecond = $('#' + nameCursor2);
+
+		var slideAreaSafe = $('#' + nameSafe);
+		var slideAreaWarning = $('#' + nameWarning);
+		var slideAreaDanger = $('#' + nameDanger);
+
+		var valueCursor1 = $('#' + valCursor1); //added for text
+		var valueCursor2 = $('#' + valCursor2); //added for text
+
+		slidecursorFirst.draggable({
+			containment : '#' + nameInner1,
+			drag : function(ev, ui) {
+				var z1 = parseInt(slidecursorFirst.css("z-index"), 10);
+				var z2 = parseInt(slidecursorSecond.css("z-index"), 10);
+				if (z1 <= z2) {
+					slidecursorFirst.css("z-index", z2 + 1);
+				}
+
+				var posX1 = ui.offset.left - originX;
+				var posX2 = (len - posX1)
+						- (len - (slidecursorSecond.offset().left - originX));
+				var lenFirst = slidebarFirst.width();
+
+				slidebarSecond.css({
+					left : posX1,
+					width : len - posX1 + 10
+				});
+				slidecursorSecond.css({
+					left : posX2
+				});
+
+				slideAreaSafe.css({
+					width : posX1 + 5
+				});
+				slideAreaWarning.css({
+					left : posX1 + 5,
+					width : lenFirst - posX1 - 5
+				});
+
+				var tempValue = Math.round(((posX1) * max) / len); //added for text
+				valueCursor1.css({
+					left : posX1
+				}); //added for text
+				valueCursor1.empty().html(tempValue); //added for text
+			}
+		});
+
+		slidecursorSecond.draggable({
+			containment : '#' + nameInner2,
+			drag : function(ev, ui) {
+				var z1 = parseInt(slidecursorFirst.css("z-index"), 10);
+				var z2 = parseInt(slidecursorSecond.css("z-index"), 10);
+				console.error(z1, z2);
+				if (z1 >= z2) {
+					slidecursorSecond.css("z-index", z1 + 1);
+				}
+
+				var pos = ui.offset.left - originX;
+				var posFirst = slidecursorFirst.offset().left - originX;
+
+				slidebarFirst.css({
+					width : pos + 10
+				});
+
+				slideAreaWarning.css({
+					width : pos - posFirst
+				});
+				slideAreaDanger.css({
+					left : pos + 5,
+					width : len - pos + 5
+				});
+
+				var tempValue = Math.round((pos * max) / len); //added for text
+				valueCursor2.css({
+					left : pos
+				}); //added for text
+				valueCursor2.empty().html(tempValue); //added for text
+			}
+		});
+	}
+
+</script>
+
+</head>
+<body onload="makeSlidebarTwoCursor(0, 50, 100, 200, 'bar1');">
+	</br>
+	</br>
+	<span class="big bold color1">Slide Bar</span>
+	</br>
+	</br>
+	<span class="color4">This code can be applied for other slide
+		bars you want.</span>
+	</br>
+	</br>
+	</br>
+	</br>
+	<div id="bar1" style="position: relative; left: 50px; width: 300px;"></div>
+	</br>
+	</br>
+
+</body>
+</html>

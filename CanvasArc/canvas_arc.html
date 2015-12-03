@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+
+<head>
+<title>Bug Game</title>
+<meta charset="utf-8"></meta>
+<meta name=“keywords” content=“JISIKSOFT,jisiksoft,IT, Programming, Education, Publication”></meta>
+<meta name=“Description” content=“JISIKSOFT does the best to Advance Software Technology intheWorld.”></meta>
+<link rel="stylesheet" href="../common/css/jisiksoft.css"></link>
+<script src="../common/js/jquery-2.1.3.min.js"></script>
+
+<script>
+	//================================== Arc Class ============================================
+	var Arc = function(container) {
+
+		this.context = null;
+		this.centerX = null;
+		this.centerY = null;
+		this.colorType = 0;
+		this.lineWidth = 30;
+		this.radius = null;
+		this.angle = 0; //float between 0 and 2
+		this.speed = 0.03;
+		this.volumeUnit = 0.03, this.refreshTime = 0.1;
+		this.flagToMove = true;
+
+		this.setCircle(container);
+		this.draw();
+
+	};
+
+	Arc.prototype = {
+
+		strColor : [ 'green', 'yellow', 'red' ],
+		color : [ [ '#9f9', '#6f6', '#3f3', '#0f0', '#3f3', '#6f6', '#9f9' ],
+				[ '#ff9', '#ff6', '#ff3', '#ff0', '#ff3', '#ff6', '#ff9' ],
+				[ '#f99', '#f66', '#f33', '#f00', '#f33', '#f66', '#f99' ] ],
+
+		arrVolume : [ 0.03, 0.06, 0.09 ],
+		arrSpeed : [ 0.03, 0.06, 0.09 ],
+		arrTime : [ 0.1, 0.05, 0.01 ],
+
+		rect : {
+			left : null,
+			top : null,
+			width : null,
+			height : null
+		},
+
+		//---------------------------------------------------------
+		setCircle : function(container) {
+
+			var canvas = document.getElementById(container);
+			this.context = canvas.getContext('2d');
+
+			this.rect.left = 0;//$('#'+container).offset().left;
+			this.rect.top = 0;//$('#'+container).offset().top,
+			this.rect.width = canvas.width;
+			this.rect.height = canvas.height;
+			//console.error(this.rect.left +":"+ this.rect.top +":"+ this.rect.width +":"+ this.rect.height);
+			this.centerX = canvas.width / 2;
+			this.centerY = canvas.height / 2;
+			this.radius = canvas.width / 3;
+			//console.error(this.centerX +":"+ this.centerY);
+
+		},
+
+		//---------------------------------------------------------
+		draw : function() {
+			var arc = this;
+
+			this.context.clearRect(0, 0, this.rect.width, this.rect.height);
+
+			var startAngle = this.angle;
+			var endAngle = (startAngle + this.volumeUnit);
+			while (endAngle > 2) {
+				endAngle -= 2;
+			}
+
+			for (var i = 0; i < 7; i++) {
+
+				this.context.beginPath();
+				this.context.arc(this.centerX, this.centerY, this.radius,
+						Math.PI * startAngle, Math.PI * (endAngle + 0.005),
+						false);
+				this.context.lineWidth = this.lineWidth;
+				this.context.strokeStyle = this.color[this.colorType][i];
+				this.context.stroke();
+
+				startAngle = endAngle;
+				var endAngle = (startAngle + this.volumeUnit);
+				while (endAngle > 2) {
+					endAngle -= 2;
+				}
+			}
+
+			if (this.flagToMove) {
+				this.angle += this.speed;
+			}
+
+			setTimeout(function() {
+				arc.draw();
+			}, this.refreshTime * 1000);
+		},
+
+		//---------------------------------------------------------
+		changeColor : function(strClr) {
+
+			var temp = this.strColor.indexOf(strClr);
+			if (!(temp >= 0 && temp < this.strColor.length)) {
+				return false;
+			}
+
+			this.colorType = temp;
+		},
+
+		//---------------------------------------------------------
+		move : function() {
+			this.flagToMove = true;
+		},
+
+		//---------------------------------------------------------
+		stop : function() {
+			this.flagToMove = false;
+		},
+
+		//---------------------------------------------------------
+		changeVolume : function(value) {
+
+			if (value < 0) {
+				value = 0;
+			}
+			if (value > 2) {
+				value = 2;
+			}
+
+			this.volumeUnit = this.arrVolume[value];
+		},
+
+		//---------------------------------------------------------
+		changeSpeed : function(value) {
+			var circle = this;
+
+			if (value < 0) {
+				value = 0;
+			}
+			if (value > 2) {
+				value = 2;
+			}
+
+			this.speed = this.arrSpeed[value];
+			this.refreshTime = this.arrTime[value];
+		},
+
+		//---------------------------------------------------------
+		changeCircleSize : function(x, y, radius) {
+			this.centerX = x;
+			this.centerY = y;
+			this.radius = radius;
+		},
+
+		//---------------------------------------------------------
+		increaseCircle : function() {
+			this.radius++;
+		},
+
+		//---------------------------------------------------------
+		decreaseCircle : function() {
+			if (this.radius < 10) {
+				return false;
+			} //the minimum radius is 10
+			this.radius--;
+		},
+
+		//---------------------------------------------------------
+		increaseArcWidth : function() {
+			this.lineWidth++;
+		},
+
+		//---------------------------------------------------------
+		decreaseArcWidth : function() {
+			this.lineWidth--;
+		}
+	}
+
+	//================================== Circle Class ============================================
+
+	var strColor = [ 'green', 'yellow', 'red' ];
+
+	var color = [
+			[ '#0f0', '#1f1', '#2f3', '#3f3', '#4f4', '#5f5', '#6f6', '#7f7',
+					'#8f8', '#9f9', '#afa', '#bfb', '#cfc', '#dfd', '#efe',
+					'#fff' ],
+			[ '#ff0', '#ff1', '#ff2', '#ff3', '#ff4', '#ff5', '#ff6', '#ff7',
+					'#ff8', '#ff9', '#ffa', '#ffb', '#ffc', '#ffd', '#ffe',
+					'#fff' ],
+			[ '#f00', '#f11', '#f22', '#f33', '#f44', '#f55', '#f66', '#f77',
+					'#f88', '#f99', '#faa', '#fbb', '#fcc', '#fdd', '#fee',
+					'#fff' ] ];
+
+	//==============================================================================
+	var InnerCircle = function() {
+	};
+
+	//==============================================================================
+	InnerCircle.prototype = {
+
+		color : "#0f0",
+		radius : 15,
+		colorType : 0,
+
+		posX : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+		posY : [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+
+		//---------------------------------------------------------
+		draw : function(context) {
+			var circle = this;
+
+			//console.error("inside draw of InnerCircle 1");
+
+			for (var i = 15; i >= 0; i--) {
+				context.fillStyle = color[circle.colorType][i];
+				context.beginPath();
+				context.arc(circle.posX[i], circle.posY[i], circle.radius, 0,
+						Math.PI * 2, true);
+				context.fill();
+			}
+		}
+	}
+
+	//==============================================================================
+
+	var Circle = function(container) {
+
+		var context = null;
+		var innerCircle = null;
+		var centerX = null;
+		var centerY = null;
+
+		this.innerCircle = new InnerCircle();
+		this.setCircle(container);
+		this.draw();
+
+		if (this.time) {
+			this.repeat();
+		}
+	};
+
+	//==============================================================================
+	Circle.prototype = {
+
+		arrSpeed : [ 0.03, 0.08, 0.13 ],
+		arrTime : [ 0.1, 0.05, 0.01 ],
+
+		rect : {
+			left : null,
+			top : null,
+			width : null,
+			height : null
+		},
+
+		radius : null,
+		angle : 0,
+		speed : 0.03,
+		time : 0.1,
+
+		//---------------------------------------------------------
+		setCircle : function(container) {
+			var circle = this;
+
+			circle.context = document.getElementById(container)
+					.getContext('2d');
+			circle.rect.left = $('#' + container).offset().left;
+			circle.rect.top = $('#' + container).offset().top,
+					circle.rect.width = $('#' + container).width(),
+					circle.rect.height = $('#' + container).height();
+			circle.centerX = circle.rect.width / 2;
+			circle.centerY = circle.rect.width / 2;
+			circle.radius = circle.rect.width / 3;
+
+			var tempX = circle.centerX + Math.cos(parent.angle) * circle.radius;
+			var tempY = circle.centerY + Math.sin(parent.angle) * circle.radius;
+
+			for (var i = 0; i < 16; i++) {
+				circle.innerCircle.posX[i] = tempX;
+				circle.innerCircle.posY[i] = tempY;
+			}
+		},
+
+		//---------------------------------------------------------
+		update : function() {
+			var circle = this;
+
+			for (var i = 15; i > 0; i--) {
+				circle.innerCircle.posX[i] = circle.innerCircle.posX[i - 1];
+				circle.innerCircle.posY[i] = circle.innerCircle.posY[i - 1];
+			}
+
+			circle.innerCircle.posX[0] = circle.centerX
+					+ Math.cos(circle.angle) * circle.radius;
+			circle.innerCircle.posY[0] = circle.centerY
+					+ Math.sin(circle.angle) * circle.radius;
+
+			circle.angle += circle.speed;
+		},
+
+		//---------------------------------------------------------
+		draw : function() {
+			var circle = this;
+
+			circle.context.clearRect(0, 0, circle.rect.width,
+					circle.rect.height);
+			circle.update();
+			circle.innerCircle.draw(circle.context);
+		},
+
+		//---------------------------------------------------------
+		changeColor : function(strClr) {
+			var circle = this;
+
+			var temp = strColor.indexOf(strClr);
+			if (!(temp >= 0 && temp < strColor.length)) {
+				return false;
+			}
+
+			circle.innerCircle.colorType = temp;
+		},
+
+		//---------------------------------------------------------
+		changeSpeed : function(value) {
+			var circle = this;
+
+			if (value < 0) {
+				value = 0;
+			}
+			if (value > 2) {
+				value = 2;
+			}
+
+			circle.speed = circle.arrSpeed[value];
+			circle.time = circle.arrTime[value];
+		},
+
+		//---------------------------------------------------------
+		changeCircleSize : function(x, y, radius) {
+			var circle = this;
+
+			circle.centerX = x;
+			circle.centerY = y;
+			circle.radius = radius;
+		},
+
+		//---------------------------------------------------------
+		changeInnerCircleSize : function(radius) {
+			var circle = this;
+
+			circle.innerCircle.radius = radius;
+		},
+
+		//---------------------------------------------------------
+		increaseCircle : function() {
+			var circle = this;
+
+			circle.radius += 3;
+		},
+
+		//---------------------------------------------------------
+		decreaseCircle : function() {
+			var circle = this;
+
+			if (circle.radius < 10) {
+				return false;
+			} //the minimum radius is 10
+
+			circle.radius -= 3;
+		},
+
+		//---------------------------------------------------------
+		increaseInnerCircle : function() {
+			var circle = this;
+
+			if (circle.innerCircle.radius > 30) {
+				return false;
+			} //the maximum radius is 20
+
+			circle.innerCircle.radius += 3;
+		},
+
+		//---------------------------------------------------------
+		decreaseInnerCircle : function() {
+			var circle = this;
+
+			if (circle.innerCircle.radius < 1) {
+				return false;
+			}
+
+			circle.innerCircle.radius -= 3;
+		},
+
+		//---------------------------------------------------------
+		repeat : function() {
+			var circle = this;
+			var fn = function() {
+				circle.draw();
+			}
+			window.setInterval(fn, circle.time * 1000);
+		},
+	}
+
+	//===================================================================================
+
+	var arc;
+
+	//----------------------------------------------------------------------------
+	function changeColor(color) {
+		arc.changeColor(color);
+	}
+
+	//----------------------------------------------------------------------------
+	function move() {
+		arc.move();
+	}
+
+	//----------------------------------------------------------------------------
+	function stop() {
+		arc.stop();
+	}
+
+	//----------------------------------------------------------------------------
+	function changeVolume(volume) {
+		arc.changeVolume(volume);
+	}
+
+	//----------------------------------------------------------------------------
+	function changeSpeed(speed) {
+		arc.changeSpeed(speed);
+	}
+
+	//----------------------------------------------------------------------------
+	function decreaseCircle() {
+		arc.decreaseCircle();
+	}
+
+	//----------------------------------------------------------------------------
+	function increaseCircle() {
+		arc.increaseCircle();
+	}
+
+	//----------------------------------------------------------------------------
+	function decreaseInnerCircle() {
+		arc.decreaseArcWidth();
+	}
+
+	//----------------------------------------------------------------------------
+	function increaseInnerCircle() {
+		arc.increaseArcWidth();
+	}
+
+	var circle;
+
+	//----------------------------------------------------------------------------
+	function changeColor2(color) {
+		circle.changeColor(color);
+	}
+
+	//----------------------------------------------------------------------------
+	function changeSpeed2(speed) {
+		circle.changeSpeed(speed);
+	}
+
+	//----------------------------------------------------------------------------
+	function decreaseCircle2() {
+		circle.decreaseCircle();
+	}
+
+	//----------------------------------------------------------------------------
+	function increaseCircle2() {
+		circle.increaseCircle();
+	}
+
+	//----------------------------------------------------------------------------
+	function decreaseInnerCircle2() {
+		circle.decreaseInnerCircle();
+	}
+
+	//----------------------------------------------------------------------------
+	function increaseInnerCircle2() {
+		circle.increaseInnerCircle();
+	}
+
+	//----------------------------------------------------------------------------
+	$(document).ready(function() {
+
+		arc = new Arc("canvas");
+		circle = new Circle("canvas2");
+	})
+</script>
+
+</head>
+<body>
+	</br>
+	</br>
+	<span class="big bold color1">Canvas Arc in Javascript</span>
+	</br>
+	</br>
+	<span class="color4">This sample is useful to make a dynamic web
+		program.</span>
+	</br>
+	</br>
+	<div
+		style="position: relative; top: 5px; left: 5px; width: 300px; height: 300px; z-index: 1; float: left;">
+		<div
+			style="position: absolute; width: 100%; height: 100%; z-index: 1; background-color: #4f70ec;"></div>
+		<div id="arc" style="position: absolute; z-index: 10;">
+			<canvas id="canvas2" width="300" height="300"></canvas>
+		</div>
+	</div>
+	<div
+		style="position: relative; top: 10px; left: 20px; z-index: 11; float: left;">
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="changeColor2('green');">green</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="changeColor2('yellow');">yellow</div>
+			<div class="btn1"
+				style="position: relative; left: 20px; float: left;"
+				onclick="changeColor2('red');">red</div>
+		</div>
+		<div style="position: relative; height: 5px; clear: left;"></div>
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="changeSpeed2(0);">speed(0)</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="changeSpeed2(1);">speed(1)</div>
+			<div class="btn1"
+				style="position: relative; left: 20px; float: left;"
+				onclick="changeSpeed2(2);">speed(2)</div>
+		</div>
+		<div style="position: relative; height: 5px; clear: left;"></div>
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="decreaseCircle2();">-</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="increaseCircle2();">+</div>
+		</div>
+		<div style="position: relative; height: 5px; clear: left;"></div>
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="decreaseInnerCircle2();">(-)</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="increaseInnerCircle2();">(+)</div>
+		</div>
+	</div>
+
+	<div style="position: relative; height: 50px; clear: left;"></div>
+
+	<div
+		style="position: relative; top: 5px; left: 5px; width: 300px; height: 300px; z-index: 1; float: left;">
+		<div
+			style="position: absolute; width: 100%; height: 100%; z-index: 1; background-color: #4f70ec;"></div>
+		<div id="arc"
+			style="position: absolute; width: 300px; height: 300px; z-index: 10;">
+			<canvas id="canvas" width="300" height="300"></canvas>
+		</div>
+	</div>
+	<div
+		style="position: relative; top: 10px; left: 20px; z-index: 11; float: left;">
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="changeColor('green');">green</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="changeColor('yellow');">yellow</div>
+			<div class="btn1"
+				style="position: relative; left: 20px; float: left;"
+				onclick="changeColor('red');">red</div>
+		</div>
+		<div style="position: relative; height: 5px; clear: left;"></div>
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="move();">move</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="stop();">stop</div>
+		</div>
+		<div style="position: relative; height: 5px; clear: left;"></div>
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="changeVolume(0);">volume(0)</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="changeVolume(1);">volume(1)</div>
+			<div class="btn1"
+				style="position: relative; left: 20px; float: left;"
+				onclick="changeVolume(2);">volume(2)</div>
+		</div>
+		<div style="position: relative; height: 5px; clear: left;"></div>
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="changeSpeed(0);">speed(0)</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="changeSpeed(1);">speed(1)</div>
+			<div class="btn1"
+				style="position: relative; left: 20px; float: left;"
+				onclick="changeSpeed(2);">speed(2)</div>
+		</div>
+		<div style="position: relative; height: 5px; clear: left;"></div>
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="decreaseCircle();">-</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="increaseCircle();">+</div>
+		</div>
+		<div style="position: relative; height: 5px; clear: left;"></div>
+		<div>
+			<div class="btn1" style="position: relative; float: left;"
+				onclick="decreaseInnerCircle();">(-)</div>
+			<div class="btn1"
+				style="position: relative; left: 10px; float: left;"
+				onclick="increaseInnerCircle();">(+)</div>
+		</div>
+	</div>
+	<div style="position: relative; height: 10px; clear: left;"></div>
+
+</body>
+</html>

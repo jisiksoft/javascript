@@ -1,0 +1,38 @@
+.color1 { color: #1646a7; }
+.color2 { color: #0d4a57; }
+.color3 { color: #d7a10f; }
+.color4 { color: #4f70ec; }
+.color5 { color: #9d2aed; }
+.color6 { color: #56d768; }
+.color7 { color: #05cffa; }
+.gray { color: #999999; }
+.red { color: #dd0000; }
+.green { color: #00aa00; }
+.blue { color: #0000aa; }
+.pink { color: #ff0080; }
+.ocher { color: #dd7700; }
+.orange { color: #ffa500; }
+.purple { color: #800080; }
+.under { text-decoration: underline; }
+.arial { font-family: arial; }
+.bold { font-weight: bold; }
+.big { font-size: 24px; }
+.normal { font-size: 17px; }
+.small { font-size: 14px; }
+.line_20 { line-height:2.0em; }
+.pointer { cursor: pointer; }
+.tab { position:absolute; left:25px; }
+
+.btn1 {
+	width:70px;
+	border-radius: 20px;
+	color: #ffffff;
+	font-size: 13px;
+	text-align: center;
+	background: #9d2aed;
+	padding: 2px 5px 2px 5px;
+	cursor: pointer;
+}
+.btn1:hover {
+	background: #9d2aaa;
+}

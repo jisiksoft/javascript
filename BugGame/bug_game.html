@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<head>
+<title>Bug Game</title>
+<meta charset="utf-8"></meta>
+<meta name=“keywords” content=“JISIKSOFT, jisiksoft, IT, Programming, Education, Publication”></meta>
+<meta name=“Description” content=“JISIKSOFT does the best to Advance Software Technology in the World.”></meta>
+<link rel="stylesheet" href="../common/css/jisiksoft.css"></link>
+<script src="../common/js/jquery-2.1.3.min.js"></script>
+
+<script>
+	var timerMove = null;
+	var timerMake = null;
+
+	var index = 0;
+	var cntKilled = 0;
+
+	//----------------------------------------------------------------------------
+	function hitBug(myId) {
+
+		var myName = $('#' + myId).attr('name');
+		var no = myName.replace(myId + '_', '');
+
+		no -= 1;
+
+		$('#' + myId).attr('name', myId + '_' + no);
+
+		if (no == 0) {
+			$('#' + myId).css('display', 'none');
+			cntKilled += 1;
+			$('#count').empty().html(cntKilled);
+		}
+	}
+
+	//----------------------------------------------------------------------------
+	function moveBugs() {
+
+		var bugs = $('.iamabug'), centerX = $('#bug').width() / 2, centerY = $(
+				'#bug').height() / 2, curPosX, curPosY;
+
+		$(bugs).each(function(index) {
+
+			curPosX = $(this).offset().left - $('#bug').offset().left;
+			curPosY = $(this).offset().top - $('#bug').offset().top;
+
+			$(this).animate({
+				rotate : (Math.random() * 40) - 20 + 'deg', //bugs move to the center.
+				left : (curPosX * 40 + centerX) / 41,
+				top : (curPosY * 40 + centerY) / 41
+			}, 1);
+		});
+
+		timerMove = setTimeout(function() {
+			moveBugs();
+		}, 1 * 1000); //bug moves every second.
+	}
+
+	//----------------------------------------------------------------------------
+	function makeBugs() {
+
+		var noClick = 1; //the number of clicking to kill a bug.
+
+		var i, str = '', WIDTH = $('#bug').width(), HEIGHT = $('#bug').height();
+
+		//alert(WIDTH + " " + HEIGHT);
+
+		for (i = 0; i < 5; i++) {
+
+			var randomDim = Math.floor(Math.random() * 4), randomX = Math
+					.random()
+					* WIDTH, randomY = Math.random() * HEIGHT, myId = 'bug'
+					+ index;
+
+			str += '<div class="iamabug" id="' + myId + '" name="' + myId + '_'
+					+ noClick + '" onclick="hitBug(\'' + myId
+					+ '\')" style="position:absolute;z-index:5;cursor:pointer;';
+
+			if (randomDim == 0) {
+				str += 'left:' + randomX + 'px;top:-15px;';
+			} else if (randomDim == 1) {
+				str += 'left:-30px;top:' + randomY + 'px;';
+			} else if (randomDim == 2) {
+				str += 'left:' + randomX + 'px;top:' + HEIGHT + 'px;';
+			} else {
+				str += 'left:' + WIDTH + 'px;top:' + randomY + 'px;';
+			}
+
+			str += '">iAmAbUG:click</div>';
+
+			index += 1;
+		}
+
+		$('#bug').append(str);
+
+		timerMake = setTimeout(function() {
+			makeBugs();
+		}, 4 * 1000); //new bugs appear every 4 seconds
+	}
+
+	makeBugs();
+	moveBugs();
+</script>
+
+</head>
+<body>
+	</br>
+	</br>
+	<span class="big bold color1">Bug Game</span>
+	</br>
+	</br>
+	<span class="color4">It is impossible to kill every bug.</br> You
+		know the reason...</br> Software only follows a programmer who has given
+		algorithm...</br> So, a programmer must be a good man for the future.</br> "I
+		will be back."^^</br> The future robots can be good or bad... depends on
+		us...</br> AI will be based on human forever.
+	</span>
+	</br>
+	<div
+		style="position: relative; width: 100%; height: 50px; z-index: 10; background-color: #ffffff;"></div>
+	<div style="position: relative;">
+		<div id="count"
+			style="position: absolute; top: 240px; left: 260px; z-index: 2; font-size: 100px; color: #d7a10f;">0</div>
+		<div
+			style="position: relative; width: 50px; height: 500px; z-index: 10; background-color: #ffffff; float: left;"></div>
+		<div id="bug"
+			style="position: relative; width: 490px; height: 500px; background-color: #05cffa; float: left;"></div>
+		<div
+			style="position: relative; width: 110px; height: 500px; z-index: 10; background-color: #ffffff; float: left;"></div>
+	</div>
+	<div
+		style="position: relative; width: 100%; height: 50px; z-index: 10; background-color: #ffffff; clear: left;"></div>
+
+</body>
+</html>

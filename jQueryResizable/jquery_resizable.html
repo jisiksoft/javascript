@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<head>
+<title>Bug Game</title>
+<meta charset="utf-8"></meta>
+<meta name=“keywords” content=“JISIKSOFT,jisiksoft,IT,Programming,Education, Publication”></meta>
+<meta name=“Description” content=“JISIKSOFT does the best to Advance
+	SoftwareTechnologyintheWorld.”></meta>
+<link rel="stylesheet" href="../common/css/jquery-ui.min.css"></link>
+<link rel="stylesheet" href="../common/css/jisiksoft.css"></link>
+<script src="../common/js/jquery-2.1.3.min.js"></script>
+<script src="../common/js/jquery-ui.min.js"></script>
+
+<script>
+	var ImageDiv = function(parentContainer, myId, myType, myRect) {
+
+		this.container = parentContainer;
+		this.id = myId;
+		this.type = myType;
+		this.rect = myRect;
+
+		this.createDiv();
+	};
+
+	ImageDiv.prototype = {
+
+		rectLeftBackground : [ 0, 0, 100, 600 ], //[left,top,width,height]
+		rectRightBackground : [ 100, 0, 500, 600 ], //[left,top,width,height]
+
+		arrLeftImageDiv : new Array(),
+		arrRightImageDiv : new Array(),
+
+		arrTypeColor : [ "#9d3aed", "#ad4aed", "#bd5aed", "#cd6aed", "#dd7aed",
+				"#ed8aed", "#fd9aed", "#fdaaed", "#fdbaed" ],
+
+		indexForId : 1,
+
+		//---------------------------------------------------------
+		createDiv : function() {
+
+			var str = '<div id="'+this.id+'" style="position:absolute;left:'
+							+this.rect[0]+'px;top:'
+							+this.rect[1]+'px;width:'
+							+this.rect[2]+'px;height:'
+							+this.rect[3]+'px;z-index:10;background-color:'
+							+ImageDiv.prototype.arrTypeColor[this.type]+';text-indent:10px;line-height:40px;">';
+			if (this.container == 'right_background') {
+				str += this.id;
+			}
+			str += '</div>';
+
+			$('#' + this.container).append(str);
+		},
+
+		//---------------------------------------------------------
+		draggableLeftImage : function() {
+
+			var thisDiv = this;
+
+			$('#' + thisDiv.id)
+					.draggable(
+							{
+
+								cursor : 'move',
+
+								stop : function(event, ui) {
+
+									var X = $(this).position().left;
+									var Y = $(this).position().top;
+
+									if (thisDiv.isMovedIntoDrawArea(X, Y)) {
+										var anImageDiv = new ImageDiv(
+												"right_background",
+												ImageDiv.prototype.indexForId,
+												thisDiv.type,
+												[
+														X
+																- ImageDiv.prototype.rectRightBackground[0],
+														Y
+																- ImageDiv.prototype.rectRightBackground[1],
+														thisDiv.rect[2],
+														thisDiv.rect[3] ]);
+										anImageDiv.draggableRightImage();
+										ImageDiv.prototype.arrRightImageDiv
+												.push(anImageDiv);
+										ImageDiv.prototype.indexForId += 1;
+										thisDiv.moveToOriginPosition();
+										return true;
+									} else {
+										thisDiv.moveToOriginPosition();
+										return true;
+									}
+								}
+							});
+		},
+
+		//---------------------------------------------------------
+		draggableRightImage : function() {
+
+			var thisDiv = this;
+
+			$('#' + thisDiv.id)
+					.draggable({
+
+						cursor : 'move',
+
+						containment : '#right_background',
+
+						stop : function(event, ui) {
+							thisDiv.rect[0] = $(this).position().left;
+							thisDiv.rect[1] = $(this).position().top;
+							return true;
+						}
+					})
+					.resizable({
+
+						stop : function(event, ui) {
+							thisDiv.rect[2] = ui.size.width;
+							thisDiv.rect[3] = ui.size.height;
+						}
+					})
+					.click(
+							function(e) {
+
+								if (e.shiftKey) {
+
+									var anImageDiv = new ImageDiv(
+											"right_background",
+											ImageDiv.prototype.indexForId,
+											thisDiv.type, [
+													thisDiv.rect[0] + 10,
+													thisDiv.rect[1] + 10,
+													thisDiv.rect[2],
+													thisDiv.rect[3] ]);
+									anImageDiv.draggableRightImage();
+									ImageDiv.prototype.arrRightImageDiv
+											.push(anImageDiv);
+									ImageDiv.prototype.indexForId += 1;
+
+								} else {
+
+									var str = 'ID : <input id="num_id" type="text" value="'+thisDiv.id+'" size="10">';
+
+									$('#popup_property_image')
+											.dialog(
+													{
+
+														resizable : false,
+														modal : true,
+														title : 'Property',
+														height : 180,
+														width : 250,
+														buttons : {
+															"Set" : function() {
+																var numId = $(
+																		'#num_id')
+																		.val();
+
+																if ($('#'
+																		+ numId).length == 0) {
+																	$(
+																			'#'
+																					+ thisDiv.id)
+																			.attr(
+																					'id',
+																					numId)
+																			.empty()
+																			.html(
+																					numId);
+																	thisDiv.id = numId;
+																	if (numId >= ImageDiv.prototype.indexForId) {
+																		ImageDiv.prototype.indexForId = (numId * 1) + 1;
+																	}
+																	$(this)
+																			.dialog(
+																					'close');
+																} else {
+																	alert('The id "'
+																			+ numId
+																			+ '" is already exists.');
+																}
+															},
+															Cancel : function() {
+																$(this)
+																		.dialog(
+																				'close');
+															}
+														}
+													});
+
+									$('#popup_property_image_inner').empty()
+											.html(str);
+								}
+							});
+		},
+
+		//---------------------------------------------------------
+		moveToOriginPosition : function() {
+
+			var thisDiv = this;
+
+			$('#' + thisDiv.id).css({
+				left : thisDiv.rect[0],
+				top : thisDiv.rect[1],
+				width : thisDiv.rect[2],
+				height : thisDiv.rect[3]
+			});
+		},
+
+		//---------------------------------------------------------
+		isMovedIntoDrawArea : function(X, Y) {
+
+			if ((X > this.rectRightBackground[0])
+					&& (X + this.rect[2] < this.rectRightBackground[0]
+							+ this.rectRightBackground[2])
+					&& (Y > this.rectRightBackground[1])
+					&& (Y + this.rect[3] < this.rectRightBackground[1]
+							+ this.rectRightBackground[3])) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
+	//----------------------------------------------------------------------------
+	function init() {
+
+		$('#left_background').css({
+			left : ImageDiv.prototype.rectLeftBackground[0],
+			top : ImageDiv.prototype.rectLeftBackground[1],
+			width : ImageDiv.prototype.rectLeftBackground[2],
+			height : ImageDiv.prototype.rectLeftBackground[3]
+		});
+
+		$('#right_background').css({
+			left : ImageDiv.prototype.rectRightBackground[0],
+			top : ImageDiv.prototype.rectRightBackground[1],
+			width : ImageDiv.prototype.rectRightBackground[2],
+			height : ImageDiv.prototype.rectRightBackground[3]
+		});
+	}
+
+	//----------------------------------------------------------------------------
+	function addLeftImages() {
+
+		for (var i = 0; i < 9; i++) {
+			var anImageDiv = new ImageDiv('left_background', 'left_' + i, i, [
+					20, 30 + i * 60, 60, 40 ]);
+			anImageDiv.draggableLeftImage();
+			ImageDiv.prototype.arrLeftImageDiv.push(anImageDiv);
+		}
+	}
+
+</script>
+
+</head>
+<body onload="init();addLeftImages();">
+	</br>
+	</br>
+	<span class="big bold color1">jQuery Resizable</span>
+	</br>
+	</br>
+	<span class="color4">jQuery makes a programmer save developing
+		time.</br> This sample is useful to make a booking system.</br> For example,
+		camping zone, hotel, and etc...</br> A manager can make UI of a booking
+		system by himself.</br> In the real system, properties of div tags will be
+		saved in a server.
+	</span>
+	</br>
+	</br>
+	<div style="position: relative; height: 600px;">
+		<div id="left_background"
+			style="position: absolute; background-color: #d7a10f;"></div>
+		<div id="right_background"
+			style="position: absolute; background-color: #56d768;"></div>
+		<div id="popup_property_image" style="display: none">
+			<div id="popup_property_image_inner"></div>
+		</div>
+	</div>
+	</br>
+
+</body>
+</html>
